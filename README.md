@@ -91,7 +91,7 @@ That matters as much as the code itself.
 ## Submitting Your Work
 
 1. Fork this repository.
-2. Commit your work incrementally — meaningful commit messages, not one big push at the end.
+2. Commit your work incrementally — please provide meaningful commit messages, not one big push at the end.
 3. Fill out `DECISIONS.md` and `QUESTIONS.md`.
 4. Send us the link to your fork when you are done.
 
