@@ -97,3 +97,5 @@ That matters as much as the code itself.
 
 Your commit history is part of your submission. It shows how you work, not just what
 you produced.
+
+-------------
