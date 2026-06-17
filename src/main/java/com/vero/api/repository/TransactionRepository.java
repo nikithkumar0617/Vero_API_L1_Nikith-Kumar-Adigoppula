@@ -3,8 +3,11 @@ package com.vero.api.repository;
 import com.vero.api.model.Category;
 import com.vero.api.model.Transaction;
 import org.springframework.data.jpa.repository.JpaRepository;
+<<<<<<< HEAD
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+=======
+>>>>>>> f6485048aade648a75adf50fd82ab90c81e2670d
 
 import java.util.List;
 
@@ -17,6 +20,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     List<Transaction> findByAccountId(Long accountId);
 
     List<Transaction> findByCategory(Category category);
+<<<<<<< HEAD
 
     @Query("""
         SELECT t
@@ -30,4 +34,6 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
             @Param("year") int year,
             @Param("month") int month
     );
+=======
+>>>>>>> f6485048aade648a75adf50fd82ab90c81e2670d
 }

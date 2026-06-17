@@ -25,6 +25,7 @@ public final class BudgetCalculator {
      * @return a map of Category to total spend, sorted descending by spend, limited to topN entries
      */
     public static Map<Category, BigDecimal> getTopSpendingCategories(List<Transaction> transactions, int topN) {
+<<<<<<< HEAD
         return transactions.stream()
             .collect(java.util.stream.Collectors.groupingBy(
                     Transaction::getCategory,
@@ -43,5 +44,9 @@ public final class BudgetCalculator {
                     (map, entry) -> map.put(entry.getKey(), entry.getValue()),
                     LinkedHashMap::putAll
             );
+=======
+        // TODO: implement
+        return new LinkedHashMap<>();
+>>>>>>> f6485048aade648a75adf50fd82ab90c81e2670d
     }
 }
