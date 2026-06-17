@@ -7,25 +7,26 @@
 **Date submitted:17-Jun-2026**
 
 I started by reading the README, understanding the project structure, and running the test suite. My priority was to get the application compiling and passing tests before making any additional changes. Once the failing tests and compilation issues were identified, I focused on fixing the root causes and verifying the fixes through Maven tests.
+
 ---
 
 ## 1. Code & Design Decisions
 
 **Auditable**
 
-**I did not modify the Auditable class because it was not directly related to the failing tests or functionality required by the assessment. The Auditable pattern is useful for sharing common fields such as createdAt and updatedAt across multiple entities and avoiding code duplication. The tradeoff is that it introduces inheritance into the domain model, which adds complexity if only a small number of entities need those fields. Since the current assessment did not require audit tracking functionality, I left it unchanged.**
+I did not modify the Auditable class because it was not directly related to the failing tests or functionality required by the assessment. The Auditable pattern is useful for sharing common fields such as createdAt and updatedAt across multiple entities and avoiding code duplication. The tradeoff is that it introduces inheritance into the domain model, which adds complexity if only a small number of entities need those fields. Since the current assessment did not require audit tracking functionality, I left it unchanged.
 
 **TransactionResponse**
 
-**I did not make major structural changes to TransactionResponse. Response DTOs are important because they define exactly what information is exposed to API consumers. Returning entities directly can expose internal fields, create tight coupling between database models and API contracts, and sometimes cause serialization issues. DTOs provide a controlled and stable API layer.**
+I did not make major structural changes to TransactionResponse. Response DTOs are important because they define exactly what information is exposed to API consumers. Returning entities directly can expose internal fields, create tight coupling between database models and API contracts, and sometimes cause serialization issues. DTOs provide a controlled and stable API layer.
 
 **BudgetCalculator**
 
-**I implemented BudgetCalculator using Java Streams with groupingBy and reducing to aggregate transaction amounts by category. After aggregation, I sorted the entries by total spend in descending order and collected them into a LinkedHashMap to preserve the sorted order. I considered using manual loops and temporary maps, but the stream-based approach was concise, readable, and aligned with modern Java practices.**
+I implemented BudgetCalculator using Java Streams with groupingBy and reducing to aggregate transaction amounts by category. After aggregation, I sorted the entries by total spend in descending order and collected them into a LinkedHashMap to preserve the sorted order. I considered using manual loops and temporary maps, but the stream-based approach was concise, readable, and aligned with modern Java practices.
 
 **Other Decisions**
 
-**The most significant decision was to follow the existing project structure and make targeted fixes rather than redesigning components. My goal was to fix defects while preserving the intended architecture and keeping changes minimal and easy to review.**
+The most significant decision was to follow the existing project structure and make targeted fixes rather than redesigning components. My goal was to fix defects while preserving the intended architecture and keeping changes minimal and easy to review.
 
 ---
 
@@ -33,19 +34,19 @@ I started by reading the README, understanding the project structure, and runnin
 
 **Missing Repository Method**
 
-**I found a compilation failure because TransactionServiceImpl referenced findByCategoryAndMonth, but the method was not present in TransactionRepository. This prevented the project from compiling. I fixed it by adding a repository query method with the required parameters.**
+I found a compilation failure because TransactionServiceImpl referenced findByCategoryAndMonth, but the method was not present in TransactionRepository. This prevented the project from compiling. I fixed it by adding a repository query method with the required parameters.
 
 **Monthly Spend Boundary Bug**
 
-**The monthly spend calculation excluded transactions occurring on the first day of the month. The cause was the use of isAfter(startOfMonth), which returns false for the first day itself. I fixed it by changing the condition to !isBefore(startOfMonth), ensuring the full month range is included.**
+The monthly spend calculation excluded transactions occurring on the first day of the month. The cause was the use of isAfter(startOfMonth), which returns false for the first day itself. I fixed it by changing the condition to !isBefore(startOfMonth), ensuring the full month range is included.
 
 **BudgetCalculator Implementation Missing**
 
-**BudgetCalculator.getTopSpendingCategories was left as a TODO and always returned an empty map. This caused test failures. I implemented the aggregation, sorting, and limiting logic required by the specification.**
+BudgetCalculator.getTopSpendingCategories was left as a TODO and always returned an empty map. This caused test failures. I implemented the aggregation, sorting, and limiting logic required by the specification.
 
 **Problems Not Fixed**
 
-**I noticed that getTransactionsByDateRange still contains a TODO implementation. I chose not to modify it because it was not required to pass the provided tests and changing unrelated functionality could introduce unintended behavior.**
+I noticed that getTransactionsByDateRange still contains a TODO implementation. I chose not to modify it because it was not required to pass the provided tests and changing unrelated functionality could introduce unintended behavior.
 
 
 ---
