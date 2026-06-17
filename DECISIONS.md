@@ -1,110 +1,99 @@
 # Decisions
 
-**Name:**
+**Name: Nikith Kumar Adigoppula**
 
-**Date started:**
+**Date started: 17-Jun-2026**
 
-**Date submitted:**
+**Date submitted:17-Jun-2026**
 
-In two or three sentences, describe your overall approach before getting into specifics.
-What did you read first? What did you prioritise, and why?
-
+I started by reading the README, understanding the project structure, and running the test suite. My priority was to get the application compiling and passing tests before making any additional changes. Once the failing tests and compilation issues were identified, I focused on fixing the root causes and verifying the fixes through Maven tests.
 ---
 
 ## 1. Code & Design Decisions
 
-**The codebase includes an `Auditable` abstract class that is not currently used by any
-entity. What did you do with it, if anything? Walk through your reasoning — what is the
-purpose of the Auditable pattern, what are the tradeoffs of using it versus not, and why
-did you make the choice you did?**
+**Auditable**
 
+**I did not modify the Auditable class because it was not directly related to the failing tests or functionality required by the assessment. The Auditable pattern is useful for sharing common fields such as createdAt and updatedAt across multiple entities and avoiding code duplication. The tradeoff is that it introduces inheritance into the domain model, which adds complexity if only a small number of entities need those fields. Since the current assessment did not require audit tracking functionality, I left it unchanged.**
 
+**TransactionResponse**
 
-**`TransactionResponse` is used as the outbound DTO for the API. What changes did you
-make to it, if any? Why does the shape of a response DTO matter — and what is the risk
-of returning an entity directly from a controller?**
+**I did not make major structural changes to TransactionResponse. Response DTOs are important because they define exactly what information is exposed to API consumers. Returning entities directly can expose internal fields, create tight coupling between database models and API contracts, and sometimes cause serialization issues. DTOs provide a controlled and stable API layer.**
 
+**BudgetCalculator**
 
+**I implemented BudgetCalculator using Java Streams with groupingBy and reducing to aggregate transaction amounts by category. After aggregation, I sorted the entries by total spend in descending order and collected them into a LinkedHashMap to preserve the sorted order. I considered using manual loops and temporary maps, but the stream-based approach was concise, readable, and aligned with modern Java practices.**
 
-**The `BudgetCalculator` requires grouping and sorting data. What data structure or
-approach did you choose to implement it? Walk through the alternatives you considered
-and why you landed where you did.**
+**Other Decisions**
 
-
-
-**Were there any decisions you made that are not covered by the questions above? Describe
-the most significant one and your reasoning.**
-
-
+**The most significant decision was to follow the existing project structure and make targeted fixes rather than redesigning components. My goal was to fix defects while preserving the intended architecture and keeping changes minimal and easy to review.**
 
 ---
 
 ## 2. Bug Fixes & Issues Found
 
-**Describe each problem you found in the codebase. For each one: where was it, how did
-you identify it, what did it cause, and how did you fix it?**
+**Missing Repository Method**
 
+**I found a compilation failure because TransactionServiceImpl referenced findByCategoryAndMonth, but the method was not present in TransactionRepository. This prevented the project from compiling. I fixed it by adding a repository query method with the required parameters.**
 
+**Monthly Spend Boundary Bug**
 
-**Were there any problems you noticed but chose not to fix? If so, explain why.**
+**The monthly spend calculation excluded transactions occurring on the first day of the month. The cause was the use of isAfter(startOfMonth), which returns false for the first day itself. I fixed it by changing the condition to !isBefore(startOfMonth), ensuring the full month range is included.**
 
+**BudgetCalculator Implementation Missing**
+
+**BudgetCalculator.getTopSpendingCategories was left as a TODO and always returned an empty map. This caused test failures. I implemented the aggregation, sorting, and limiting logic required by the specification.**
+
+**Problems Not Fixed**
+
+**I noticed that getTransactionsByDateRange still contains a TODO implementation. I chose not to modify it because it was not required to pass the provided tests and changing unrelated functionality could introduce unintended behavior.**
 
 
 ---
 
 ## 3. Testing Decisions
 
-**What tests did you write in `TransactionCandidateTest.java`? For each test, explain
-what behaviour it validates and why you chose to cover that behaviour.**
+**TransactionCandidateTest**
 
+My focus was on validating the behavior around spending calculations and category aggregation. The tests ensure that monthly spending calculations include valid boundary dates and that top spending categories are returned in the correct order.
 
+**What I Did Not Test**
 
-**What did you deliberately not test, and why? If you had more time, what would be the
-next most important test to add?**
+I did not write extensive integration tests, controller tests, or database tests because the assessment focused on service-layer logic and defect resolution. With additional time, I would add controller-level tests using MockMvc and integration tests against H2.
 
+**Difference Between Test Suites**
 
-
-**What is the difference between what `TransactionServiceTest` covers and what your
-`TransactionCandidateTest` covers? Are they testing the same things?**
-
+TransactionServiceTest verifies the behavior of service methods using mocked dependencies. TransactionCandidateTest focuses on candidate-added validation of the specific bugs and business rules I considered most critical. They complement each other rather than testing exactly the same behavior.
 
 
 ---
 
 ## 4. AI Tool Usage
 
-AI tool usage is expected and encouraged. Using AI is not cheating — it is a core skill
-of modern engineering. What we are evaluating is whether you used it thoughtfully:
-whether you understood and verified what it produced, and whether you can recognise
-when its output should not be trusted.
+**Tools Used**
 
-**Which AI tools did you use? (e.g. ChatGPT, Claude, GitHub Copilot, Cursor, other)**
+ChatGPT, Claude, and GitHub Copilot.
 
+**Examples**
 
+I used AI to help understand Maven build errors and identify the root cause of failing tests. AI suggested possible fixes, but I verified each suggestion by running the test suite.
 
-**Give two or three specific examples of how you used AI on this project. For each:
-what did you prompt it with, what did it return, and what did you accept, change, or
-reject?**
+I also used AI to compare implementation approaches for BudgetCalculator. After reviewing the suggestions, I implemented and validated the version that matched the expected behavior of the tests.
 
+**Incorrect AI Output**
 
+At one stage, AI generated a larger set of replacement files rather than focusing on the specific defects causing the failures. I rejected the full replacement approach because it would have unnecessarily changed working code. Instead, I used the test failures and existing project structure to guide smaller targeted fixes.
 
-**Describe a moment where AI gave you something wrong, incomplete, or subtly misleading.
-How did you catch it, and what did you do?**
+**Philosophy**
 
-
-
-**What is your general philosophy on using AI when writing backend code? Where does it
-help, and where do you not trust it?**
-
-
+AI is useful for debugging, code review, documentation, and exploring implementation options. However, I do not trust AI output without verification. All AI-generated suggestions should be validated through compilation, testing, and manual review.
 
 ---
 
-## 5. What You'd Do Next
+## 5. What I'd Do Next
 
-**If you had two more days on this project, what would you build or fix first?
-List in priority order, with one sentence of justification for each.**
+1. Implement getTransactionsByDateRange to complete unfinished functionality.
+2. Add controller-level tests using MockMvc to validate request and response behavior.
+3. Add integration tests covering repository queries and H2 database interactions.
+4. Improve validation around API inputs such as invalid dates and months.
 
-
-
-**What is the biggest remaining risk or weakness in the code you have submitted?**
+The biggest remaining weakness is the limited test coverage outside the service layer. Additional integration and controller tests would provide stronger confidence in end-to-end behavior.
